@@ -12,19 +12,19 @@ public class Product implements Serializable {
 	private Double price;
 	private Integer stock;
 	
-	private Category categoryId;
+	private Category category;
 	
 	public Product() {
 	}
 
-	public Product(Integer id, String name, String description, Double price, Integer stock, Category categoryId) {
+	public Product(Integer id, String name, String description, Double price, Integer stock, Category category) {
 		super();
 		this.id = id;
 		this.name = name;
 		this.description = description;
 		this.price = price;
 		this.stock = stock;
-		this.categoryId = categoryId;
+		this.category = category;
 	}
 
 	public Integer getId() {
@@ -67,12 +67,12 @@ public class Product implements Serializable {
 		this.stock = stock;
 	}
 
-	public Category getCategoryId() {
-		return categoryId;
+	public Category getCategory() {
+		return category;
 	}
 
-	public void setCategoryId(Category categoryId) {
-		this.categoryId = categoryId;
+	public void setCategory(Category category) {
+		this.category = category;
 	}
 
 	@Override
@@ -95,7 +95,7 @@ public class Product implements Serializable {
 	@Override
 	public String toString() {
 		return "Product [id=" + id + ", name=" + name + ", description=" + description + ", price=" + price + ", stock="
-				+ stock + ", categoryId=" + categoryId + "]";
+				+ stock + ", categoryId=" + category + "]";
 	}
 
 }
