@@ -3,9 +3,10 @@ package model.dao;
 import java.util.List;
 
 import model.entities.Customer;
+import model.entities.Order;
 import model.enums.OrderStatus;
 
-public interface Order {
+public interface OrderDao {
 	
 	void insert(Order obj);
 	void update(Order obj);

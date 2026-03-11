@@ -4,8 +4,8 @@ import model.entities.OrderItem;
 
 public interface OrderItemDao {
 	
-	void insert(Order obj);
+	void insert(OrderDao obj);
 	void deleteById(Integer id);
-	OrderItem findByOrder(Order order);
+	OrderItem findByOrder(OrderDao order);
 	
 }
