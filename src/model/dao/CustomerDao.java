@@ -11,6 +11,6 @@ public interface CustomerDao {
 	void deleteById(Integer id);
 	Customer findById(Integer id);
 	List<Customer> findAll();
-	Customer findByEmail(Customer customer);
+	Customer findByEmail(String email);
 	
 }
