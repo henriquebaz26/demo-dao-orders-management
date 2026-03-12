@@ -10,31 +10,28 @@ import java.util.List;
 
 import db.DB;
 import db.DbException;
-import model.dao.CustomerDao;
-import model.entities.Customer;
+import model.dao.CategoryDao;
+import model.entities.Category;
 
-public class CustomerDaoJDBC implements CustomerDao {
+public class CategoryDaoJDBC implements CategoryDao {
 	
 	private Connection conn;
 	
-	public CustomerDaoJDBC(Connection conn) {
+	public CategoryDaoJDBC(Connection conn) {
 		this.conn = conn;
 	}
 
 	@Override
-	public void insert(Customer obj) {
+	public void insert(Category obj) {
 		PreparedStatement pst = null;
 
 		try {
 
-			String sql = "INSERT INTO customer (Name, Email, Phone, CreatedAt) VALUES (?, ?, ?, ?)";
+			String sql = "INSERT INTO category (Name) VALUES (?)";
 
 			pst = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 
 			pst.setString(1, obj.getName());
-			pst.setString(2, obj.getEmail());
-			pst.setString(3, obj.getPhone());
-			pst.setDate(4, new java.sql.Date(obj.getCreateAt().getTime()));
 
 			int rowsAffected = pst.executeUpdate();
 
@@ -58,21 +55,18 @@ public class CustomerDaoJDBC implements CustomerDao {
 	}
 
 	@Override
-	public void update(Customer obj) {
+	public void update(Category obj) {
 		PreparedStatement pst = null;
 
 		try {
 
-			String sql = "UPDATE customer SET Name = ?, Email=?, Phone=?, CreatedAt=? WHERE Id = ?";
+			String sql = "UPDATE category SET Name = ? WHERE Id = ?";
 
 			pst = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 
 			pst.setString(1, obj.getName());
-			pst.setString(2, obj.getEmail());
-			pst.setString(3, obj.getPhone());
-			pst.setDate(4, new java.sql.Date(obj.getCreateAt().getTime()));
 			
-			pst.setInt(5, obj.getId());
+			pst.setInt(2, obj.getId());
 
 			pst.executeUpdate();
 		} catch (SQLException e) {
@@ -89,7 +83,7 @@ public class CustomerDaoJDBC implements CustomerDao {
 
 		try {
 
-			String sql = "DELETE FROM customer WHERE Id = ?";
+			String sql = "DELETE FROM category WHERE Id = ?";
 
 			pst = conn.prepareStatement(sql);
 
@@ -98,7 +92,7 @@ public class CustomerDaoJDBC implements CustomerDao {
 			int rowsAffected = pst.executeUpdate();
 
 			if (rowsAffected == 0) {
-				throw new DbException("The customer ID does not exist in the database.");
+				throw new DbException("The category ID does not exist in the database.");
 			}
 
 		} catch (SQLException e) {
@@ -110,13 +104,13 @@ public class CustomerDaoJDBC implements CustomerDao {
 	}
 
 	@Override
-	public Customer findById(Integer id) {
+	public Category findById(Integer id) {
 		PreparedStatement pst = null;
 		ResultSet rs = null;
 
 		try {
 
-			String sql = "SELECT * FROM customer WHERE Id = ?";
+			String sql = "SELECT * FROM category WHERE Id = ?";
 
 			pst = conn.prepareStatement(sql);
 
@@ -124,8 +118,8 @@ public class CustomerDaoJDBC implements CustomerDao {
 			rs = pst.executeQuery();
 
 			if (rs.next()) {
-				Customer customer = instantiateCustomer(rs);
-				return customer;
+				Category category = instantiateCategory(rs);
+				return category;
 
 			} else {
 				return null;
@@ -139,35 +133,32 @@ public class CustomerDaoJDBC implements CustomerDao {
 		}
 	}
 	
-	private Customer instantiateCustomer(ResultSet rs) throws SQLException {
-		Customer customer = new Customer();
-		customer.setId(rs.getInt("Id"));
-		customer.setName(rs.getString("Name"));
-		customer.setEmail(rs.getString("Email"));
-		customer.setPhone(rs.getString("Phone"));
-		customer.setCreateAt(rs.getDate("CreatedAt"));
-		return customer;
+	private Category instantiateCategory(ResultSet rs) throws SQLException {
+		Category category = new Category();
+		category.setId(rs.getInt("Id"));
+		category.setName(rs.getString("Name"));
+		return category;
 	}
 
 	@Override
-	public List<Customer> findAll() {
+	public List<Category> findAll() {
 		PreparedStatement pst = null;
 		ResultSet rs = null;
 
 		try {
 
-			String sql = "SELECT * FROM customer";
+			String sql = "SELECT * FROM category";
 
 			pst = conn.prepareStatement(sql);
 
 			rs = pst.executeQuery();
 
-			List<Customer> list = new ArrayList<>();
+			List<Category> list = new ArrayList<>();
 
 			while (rs.next()) {
 
-				Customer customer = instantiateCustomer(rs);
-				list.add(customer);
+				Category category = instantiateCategory(rs);
+				list.add(category);
 
 			}
 
@@ -181,36 +172,4 @@ public class CustomerDaoJDBC implements CustomerDao {
 		}
 	}
 
-	@Override
-	public Customer findByEmail(String email) {
-		PreparedStatement pst = null;
-		ResultSet rs = null;
-
-		try {
-
-			String sql = "SELECT * FROM customer WHERE Email=?";
-
-			pst = conn.prepareStatement(sql);
-
-			pst.setString(1, email);
-			rs = pst.executeQuery();
-
-			Customer cus = new Customer();
-
-			if (rs.next()) {
-
-				cus = instantiateCustomer(rs);
-
-			}
-
-			return cus;
-
-		} catch (SQLException e) {
-			throw new DbException(e.getMessage());
-		} finally {
-			DB.closeStatement(pst);
-			DB.closeResultSet(rs);
-		}
-	}
-	
 }
