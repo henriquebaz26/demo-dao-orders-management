@@ -19,6 +19,8 @@ import model.entities.Product;
 
 public class OrderItemDaoJDBC implements OrderItemDao {
 	
+	ProductDao productDao = DaoFactory.createProductDao();
+	
 	private Connection conn;
 	
 	public OrderItemDaoJDBC(Connection conn) {
@@ -35,26 +37,27 @@ public class OrderItemDaoJDBC implements OrderItemDao {
 
 			pst = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 			
-			if (obj.getProduct().getStock() < obj.getQuantity()) {
-				throw new DbException("Insufficient stock for the requested quantity.");
-			} else {
-				pst.setInt(1, obj.getQuantity());
-				pst.setDouble(2, obj.getPrice());
-				pst.setInt(3, obj.getOrder().getId());
-				pst.setInt(4, obj.getProduct().getId());
+			pst.setInt(1, obj.getQuantity());
+			pst.setDouble(2, obj.getPrice());
+			pst.setInt(3, obj.getOrder().getId());
+			pst.setInt(4, obj.getProduct().getId());
 
-				int rowsAffected = pst.executeUpdate();
+			int rowsAffected = pst.executeUpdate();
 
-				if (rowsAffected > 0) {
-					ResultSet rs = pst.getGeneratedKeys();
-					if (rs.next()) {
-						int id = rs.getInt(1);
-						obj.setId(id);
-					}
-					DB.closeResultSet(rs);
-				} else {
-					throw new DbException("Unexpected error! No rows affected");
+			if (rowsAffected > 0) {
+				ResultSet rs = pst.getGeneratedKeys();
+				if (rs.next()) {
+					int id = rs.getInt(1);
+					obj.setId(id);
 				}
+					
+				Product product = productDao.findById(obj.getProduct().getId());
+				product.decrementStock(obj.getQuantity());
+				productDao.update(product);
+					
+				DB.closeResultSet(rs);
+			} else {
+				throw new DbException("Unexpected error! No rows affected");
 			}
 
 		} catch (SQLException e) {
@@ -70,8 +73,24 @@ public class OrderItemDaoJDBC implements OrderItemDao {
 		PreparedStatement pst = null;
 
 		try {
-
-			String sql = "DELETE FROM order_item WHERE Id = ?";
+			
+			String sql = "SELECT * FROM order_item WHERE Id = ?";
+			
+			pst = conn.prepareStatement(sql);
+			
+			pst.setInt(1, id);
+			
+			ResultSet rs = pst.executeQuery();
+			
+			if (rs.next()) {
+			    Product product = productDao.findById(rs.getInt("ProductId"));
+			    product.incrementStock(rs.getInt("Quantity"));
+			    productDao.update(product);
+			} else {
+			    throw new DbException("The order item ID does not exist in the database.");
+			}
+			
+			sql = "DELETE FROM order_item WHERE Id = ?";
 
 			pst = conn.prepareStatement(sql);
 

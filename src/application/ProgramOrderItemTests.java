@@ -26,8 +26,8 @@ public static void main(String[] args) {
 		
 		System.out.println("\n=== TESTE 2: orderItem insert ===");
 		ProductDao productDao = DaoFactory.createProductDao();
-		Product product = productDao.findById(1);
-		int quantity = 2;
+		Product product = productDao.findById(5);
+		int quantity = 10;
 		OrderItem newOrderItem = new OrderItem(null, quantity, product.getPrice(), order, product);
 		orderItemDao.insert(newOrderItem);
 		System.out.println("Inserted! New id = " + newOrderItem.getId());

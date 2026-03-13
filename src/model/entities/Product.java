@@ -3,6 +3,8 @@ package model.entities;
 import java.io.Serializable;
 import java.util.Objects;
 
+import db.DbException;
+
 public class Product implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
@@ -73,6 +75,23 @@ public class Product implements Serializable {
 
 	public void setCategory(Category category) {
 		this.category = category;
+	}
+	
+	public void decrementStock(int quantity) {
+	    if (quantity <= 0) {
+	        throw new DbException("Quantity must be positive");
+	    }
+	    if (stock < quantity) {
+	        throw new DbException("Not enough stock to decrement");
+	    }
+	    this.stock -= quantity;
+	}
+	
+	public void incrementStock(int quantity) {
+	    if (quantity <= 0) {
+	        throw new DbException("Quantity must be positive");
+	    }
+	    this.stock += quantity;
 	}
 
 	@Override
