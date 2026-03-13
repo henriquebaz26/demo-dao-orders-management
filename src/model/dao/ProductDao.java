@@ -2,6 +2,7 @@ package model.dao;
 
 import java.util.List;
 
+import model.dto.MostSoldProduct;
 import model.entities.Category;
 import model.entities.Product;
 
@@ -14,5 +15,6 @@ public interface ProductDao {
 	List<Product> findAll();
 	List<Product> findByCategory(Category category);
 	List<Product> findLowStock(int threshold);
+	List<MostSoldProduct> mostSoldProduct();
 	
 }

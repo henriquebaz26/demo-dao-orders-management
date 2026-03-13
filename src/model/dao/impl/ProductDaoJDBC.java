@@ -13,6 +13,7 @@ import db.DbException;
 import model.dao.CategoryDao;
 import model.dao.DaoFactory;
 import model.dao.ProductDao;
+import model.dto.MostSoldProduct;
 import model.entities.Category;
 import model.entities.Product;
 
@@ -250,6 +251,57 @@ public class ProductDaoJDBC implements ProductDao {
 			DB.closeStatement(pst);
 			DB.closeResultSet(rs);
 		}
+	}
+
+	@Override
+	public List<MostSoldProduct> mostSoldProduct() {
+		PreparedStatement pst = null;
+		ResultSet rs = null;
+
+		try {
+
+			String sql = "SELECT \r\n"
+					+ "    p.id,\r\n"
+					+ "    p.name,\r\n"
+					+ "    SUM(oi.Quantity) AS total_sold\r\n"
+					+ "FROM \r\n"
+					+ "    product p\r\n"
+					+ "JOIN \r\n"
+					+ "    order_item oi ON p.id = oi.ProductId\r\n"
+					+ "GROUP BY \r\n"
+					+ "    p.id, p.name\r\n"
+					+ "ORDER BY \r\n"
+					+ "    total_sold DESC LIMIT 3;";
+
+			pst = conn.prepareStatement(sql);
+
+			rs = pst.executeQuery();
+
+			List<MostSoldProduct> list = new ArrayList<>();
+
+			while (rs.next()) {
+
+				MostSoldProduct product = instantiateMostSoldProduct(rs);
+				list.add(product);
+
+			}
+
+			return list;
+
+		} catch (SQLException e) {
+			throw new DbException(e.getMessage());
+		} finally {
+			DB.closeStatement(pst);
+			DB.closeResultSet(rs);
+		}
+	}
+	
+	private MostSoldProduct instantiateMostSoldProduct(ResultSet rs) throws SQLException {
+		MostSoldProduct product = new MostSoldProduct();
+		product.setId(rs.getInt("id"));
+		product.setName(rs.getString("name"));
+		product.setTotalSold(Double.parseDouble(rs.getString("total_sold")));
+		return product;
 	}
 
 }
