@@ -2,6 +2,7 @@ package model.dao;
 
 import java.util.List;
 
+import model.dto.TotalRevenueCategory;
 import model.entities.Category;
 
 public interface CategoryDao {
@@ -11,5 +12,6 @@ public interface CategoryDao {
 	void deleteById(Integer id);
 	Category findById(Integer id);
 	List<Category> findAll();
+	List<TotalRevenueCategory> totalRevenueCategory();
 	
 }

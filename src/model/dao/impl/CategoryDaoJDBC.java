@@ -11,6 +11,7 @@ import java.util.List;
 import db.DB;
 import db.DbException;
 import model.dao.CategoryDao;
+import model.dto.TotalRevenueCategory;
 import model.entities.Category;
 
 public class CategoryDaoJDBC implements CategoryDao {
@@ -170,6 +171,54 @@ public class CategoryDaoJDBC implements CategoryDao {
 			DB.closeStatement(pst);
 			DB.closeResultSet(rs);
 		}
+	}
+	
+	@Override
+	public List<TotalRevenueCategory> totalRevenueCategory() {
+		PreparedStatement pst = null;
+		ResultSet rs = null;
+
+		try {
+
+			String sql = "SELECT \r\n"
+					+ "    c.id AS category_id,\r\n"
+					+ "    c.name AS category_name,\r\n"
+					+ "    SUM(oi.quantity * oi.price) AS total_revenue\r\n"
+					+ "FROM category c\r\n"
+					+ "JOIN product p ON p.CategoryId = c.id\r\n"
+					+ "JOIN order_item oi ON oi.ProductId = p.id\r\n"
+					+ "GROUP BY c.id, c.name\r\n"
+					+ "ORDER BY total_revenue DESC LIMIT 3;";
+
+			pst = conn.prepareStatement(sql);
+
+			rs = pst.executeQuery();
+
+			List<TotalRevenueCategory> list = new ArrayList<>();
+
+			while (rs.next()) {
+
+				TotalRevenueCategory category = instantiateTotalRevenueCategory(rs);
+				list.add(category);
+
+			}
+
+			return list;
+
+		} catch (SQLException e) {
+			throw new DbException(e.getMessage());
+		} finally {
+			DB.closeStatement(pst);
+			DB.closeResultSet(rs);
+		}
+	}
+	
+	private TotalRevenueCategory instantiateTotalRevenueCategory(ResultSet rs) throws SQLException {
+		TotalRevenueCategory category = new TotalRevenueCategory();
+		category.setId(rs.getInt("category_id"));
+		category.setName(rs.getString("category_name"));
+		category.setTotalRevenue(Double.parseDouble(rs.getString("total_revenue")));
+		return category;
 	}
 
 }
