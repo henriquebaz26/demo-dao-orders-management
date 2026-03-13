@@ -217,7 +217,7 @@ public class CategoryDaoJDBC implements CategoryDao {
 		TotalRevenueCategory category = new TotalRevenueCategory();
 		category.setId(rs.getInt("category_id"));
 		category.setName(rs.getString("category_name"));
-		category.setTotalRevenue(Double.parseDouble(rs.getString("total_revenue")));
+		category.setTotalRevenue(rs.getDouble("total_revenue"));
 		return category;
 	}
 

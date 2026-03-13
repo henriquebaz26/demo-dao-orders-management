@@ -154,7 +154,7 @@ public class ProductDaoJDBC implements ProductDao {
 		product.setPrice(Double.parseDouble(rs.getString("Price")));
 		product.setStock(Integer.parseInt(rs.getString("Stock")));
 		CategoryDao categoryDao = DaoFactory.createCategoryDao();
-		Category category = categoryDao.findById(Integer.parseInt(rs.getString("CategoryId")));
+		Category category = categoryDao.findById(rs.getInt("CategoryId"));
 		product.setCategory(category);
 		return product;
 	}
@@ -300,7 +300,7 @@ public class ProductDaoJDBC implements ProductDao {
 		MostSoldProduct product = new MostSoldProduct();
 		product.setId(rs.getInt("id"));
 		product.setName(rs.getString("name"));
-		product.setTotalSold(Double.parseDouble(rs.getString("total_sold")));
+		product.setTotalSold(rs.getDouble("total_sold"));
 		return product;
 	}
 

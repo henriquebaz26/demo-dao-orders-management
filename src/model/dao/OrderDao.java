@@ -13,7 +13,7 @@ public interface OrderDao {
 	void deleteById(Integer id);
 	Order findById(Integer id);
 	List<Order> findAll();
-	List<Order> findByCustumer(Customer customer);
+	List<Order> findByCustomer(Customer customer);
 	void updateStatus(Integer orderId, OrderStatus status);
 	
 }

@@ -25,7 +25,7 @@ public class ProgramOrderTests {
 		System.out.println("\n=== TESTE 2: order findByCustomer ===");
 		CustomerDao customerDao = DaoFactory.createCustomerDao();
 		Customer customer = customerDao.findById(2);
-		List<Order> list = orderDao.findByCustumer(customer);
+		List<Order> list = orderDao.findByCustomer(customer);
 		for (Order obj : list) {
 			System.out.println(obj);
 		}

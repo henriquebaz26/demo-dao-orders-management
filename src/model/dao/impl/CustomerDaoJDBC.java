@@ -89,17 +89,29 @@ public class CustomerDaoJDBC implements CustomerDao {
 		PreparedStatement pst = null;
 
 		try {
-
-			String sql = "DELETE FROM customer WHERE Id = ?";
-
+			
+			String sql = "SELECT * FROM `order` WHERE CustomerId = ?";
+			
 			pst = conn.prepareStatement(sql);
-
+			
 			pst.setInt(1, id);
+			
+			ResultSet rs = pst.executeQuery();
+			
+			if (rs.next()) {
+				throw new DbException("Cannot delete customer: associated orders exist.");
+			} else {
+				sql = "DELETE FROM customer WHERE Id = ?";
 
-			int rowsAffected = pst.executeUpdate();
+				pst = conn.prepareStatement(sql);
 
-			if (rowsAffected == 0) {
-				throw new DbException("The customer ID does not exist in the database.");
+				pst.setInt(1, id);
+
+				int rowsAffected = pst.executeUpdate();
+
+				if (rowsAffected == 0) {
+					throw new DbException("The customer ID does not exist in the database.");
+				}
 			}
 
 		} catch (SQLException e) {

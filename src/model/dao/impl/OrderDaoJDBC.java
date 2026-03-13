@@ -38,7 +38,7 @@ public class OrderDaoJDBC implements OrderDao {
 
 			pst = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 
-			pst.setDate(1, new java.sql.Date(obj.getMoment().getTime()));
+			pst.setTimestamp(1, new java.sql.Timestamp(obj.getMoment().getTime()));
 			pst.setString(2, obj.getStatus().name());
 			pst.setInt(3, obj.getCustomer().getId());
 
@@ -73,7 +73,7 @@ public class OrderDaoJDBC implements OrderDao {
 
 			pst = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 
-			pst.setDate(1, new java.sql.Date(obj.getMoment().getTime()));
+			pst.setTimestamp(1, new java.sql.Timestamp(obj.getMoment().getTime()));
 			pst.setString(2, obj.getStatus().name());
 			pst.setInt(3, obj.getCustomer().getId());
 			
@@ -165,11 +165,11 @@ public class OrderDaoJDBC implements OrderDao {
 	
 	private Order instantiateOrder(ResultSet rs) throws SQLException {
 		Order order = new Order();
-		order.setId(Integer.parseInt(rs.getString("Id")));
-		order.setMoment(rs.getDate("Moment"));
+		order.setId(rs.getInt("Id"));
+		order.setMoment(rs.getTimestamp("Moment"));
 		order.setStatus(OrderStatus.valueOf(rs.getString("Status")));
 		CustomerDao customerDao = DaoFactory.createCustomerDao();
-		Customer customer = customerDao.findById(Integer.parseInt(rs.getString("CustomerId")));
+		Customer customer = customerDao.findById(rs.getInt("CustomerId"));
 		order.setCustomer(customer);
 		return order;
 	}
@@ -222,7 +222,7 @@ public class OrderDaoJDBC implements OrderDao {
 	}
 
 	@Override
-	public List<Order> findByCustumer(Customer customer) {
+	public List<Order> findByCustomer(Customer customer) {
 		PreparedStatement pst = null;
 		ResultSet rs = null;
 
