@@ -11,6 +11,7 @@ import java.util.List;
 import db.DB;
 import db.DbException;
 import model.dao.CustomerDao;
+import model.dto.CustomerTotalSpent;
 import model.entities.Customer;
 
 public class CustomerDaoJDBC implements CustomerDao {
@@ -204,6 +205,46 @@ public class CustomerDaoJDBC implements CustomerDao {
 			}
 
 			return cus;
+
+		} catch (SQLException e) {
+			throw new DbException(e.getMessage());
+		} finally {
+			DB.closeStatement(pst);
+			DB.closeResultSet(rs);
+		}
+	}
+
+	@Override
+	public List<CustomerTotalSpent> totalSpentByCustomer() {
+		PreparedStatement pst = null;
+		ResultSet rs = null;
+
+		try {
+
+			List<CustomerTotalSpent> list = new ArrayList<>();
+
+		    String sql =
+		        "SELECT c.Id, c.Name, SUM(oi.Quantity * oi.Price) AS TotalSpent " +
+		        "FROM customer c " +
+		        "JOIN `order` o ON o.CustomerId = c.Id " +
+		        "JOIN order_item oi ON oi.OrderId = o.Id " +
+		        "GROUP BY c.Id, c.Name";
+
+		    pst = conn.prepareStatement(sql);
+		    rs = pst.executeQuery();
+
+		    while (rs.next()) {
+
+		        CustomerTotalSpent dto = new CustomerTotalSpent();
+
+		        dto.setCustomerId(rs.getInt("Id"));
+		        dto.setName(rs.getString("Name"));
+		        dto.setTotalSpent(rs.getDouble("TotalSpent"));
+
+		        list.add(dto);
+		    }
+
+		    return list;
 
 		} catch (SQLException e) {
 			throw new DbException(e.getMessage());
