@@ -1,11 +1,12 @@
 package model.dao;
 
+import model.entities.Order;
 import model.entities.OrderItem;
 
 public interface OrderItemDao {
 	
-	void insert(OrderDao obj);
+	void insert(OrderItem obj);
 	void deleteById(Integer id);
-	OrderItem findByOrder(OrderDao order);
+	OrderItem findByOrder(Order order);
 	
 }
