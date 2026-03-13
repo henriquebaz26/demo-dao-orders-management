@@ -1,7 +1,9 @@
 package model.entities;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 import model.enums.OrderStatus;
@@ -15,11 +17,12 @@ public class Order implements Serializable {
 	
 	private Customer customer;
 	
+	private List<OrderItem> items = new ArrayList<>();
+	
 	public Order() {
 	}
 
 	public Order(Integer id, Date moment, OrderStatus status, Customer customer) {
-		super();
 		this.id = id;
 		this.moment = moment;
 		this.status = status;
@@ -57,6 +60,18 @@ public class Order implements Serializable {
 	public void setCustomer(Customer customer) {
 		this.customer = customer;
 	}
+	
+	public List<OrderItem> getItems() {
+        return items;
+    }
+	
+	public void addItem(OrderItem item) {
+		items.add(item);
+	}
+
+	public void removeItem(OrderItem item) {
+		items.remove(item);
+	}
 
 	@Override
 	public int hashCode() {
@@ -77,7 +92,12 @@ public class Order implements Serializable {
 
 	@Override
 	public String toString() {
-		return "Order [id=" + id + ", moment=" + moment + ", status=" + status + ", customer=" + customer + "]";
-	}
+		return "Order [id=" + id 
+				+ ", moment=" + moment 
+				+ ", status=" + status 
+				+ ", customer=" + customer.getName()
+				+ ", items=" + items.size()
+				+ "]";
+	}	
 	
 }

@@ -13,8 +13,11 @@ import db.DbException;
 import model.dao.CustomerDao;
 import model.dao.DaoFactory;
 import model.dao.OrderDao;
+import model.dao.ProductDao;
 import model.entities.Customer;
 import model.entities.Order;
+import model.entities.OrderItem;
+import model.entities.Product;
 import model.enums.OrderStatus;
 
 public class OrderDaoJDBC implements OrderDao {
@@ -115,18 +118,35 @@ public class OrderDaoJDBC implements OrderDao {
 	public Order findById(Integer id) {
 		PreparedStatement pst = null;
 		ResultSet rs = null;
+		PreparedStatement pstItems = null;
+		ResultSet rsItems = null;
 
 		try {
 
 			String sql = "SELECT * FROM `order` WHERE Id = ?";
-
 			pst = conn.prepareStatement(sql);
 
 			pst.setInt(1, id);
 			rs = pst.executeQuery();
 
 			if (rs.next()) {
+
 				Order order = instantiateOrder(rs);
+
+				pstItems = conn.prepareStatement(
+						"SELECT * FROM order_item WHERE OrderId = ?");
+
+				pstItems.setInt(1, order.getId());
+				rsItems = pstItems.executeQuery();
+
+				while (rsItems.next()) {
+					OrderItem item = instantiateOrderItem(rsItems);
+					order.getItems().add(item);
+				}
+
+				DB.closeStatement(pstItems);
+				DB.closeResultSet(rsItems);
+
 				return order;
 
 			} else {
@@ -138,6 +158,8 @@ public class OrderDaoJDBC implements OrderDao {
 		} finally {
 			DB.closeStatement(pst);
 			DB.closeResultSet(rs);
+			DB.closeStatement(pstItems);
+			DB.closeResultSet(rsItems);
 		}
 	}
 	
@@ -150,6 +172,21 @@ public class OrderDaoJDBC implements OrderDao {
 		Customer customer = customerDao.findById(Integer.parseInt(rs.getString("CustomerId")));
 		order.setCustomer(customer);
 		return order;
+	}
+	
+	private OrderItem instantiateOrderItem(ResultSet rs) throws SQLException {
+
+		OrderItem item = new OrderItem();
+
+		item.setQuantity(rs.getInt("Quantity"));
+		item.setPrice(rs.getDouble("Price"));
+
+		ProductDao productDao = DaoFactory.createProductDao();
+		Product product = productDao.findById(rs.getInt("ProductId"));
+
+		item.setProduct(product);
+
+		return item;
 	}
 
 	@Override

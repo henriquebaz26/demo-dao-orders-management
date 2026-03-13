@@ -5,11 +5,12 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 import db.DB;
 import db.DbException;
 import model.dao.DaoFactory;
-import model.dao.OrderDao;
 import model.dao.OrderItemDao;
 import model.dao.ProductDao;
 import model.entities.Order;
@@ -91,7 +92,7 @@ public class OrderItemDaoJDBC implements OrderItemDao {
 	}
 
 	@Override
-	public OrderItem findByOrder(Order order) {
+	public List<OrderItem> findByOrder(Order order) {
 		PreparedStatement pst = null;
 		ResultSet rs = null;
 
@@ -104,13 +105,14 @@ public class OrderItemDaoJDBC implements OrderItemDao {
 			pst.setInt(1, order.getId());
 			rs = pst.executeQuery();
 			
-			OrderItem orderItem = new OrderItem();
+			List<OrderItem> list = new ArrayList<>();
 
 			while (rs.next()) {
-				orderItem = instantiateOrderItem(rs);
+				OrderItem item = instantiateOrderItem(rs, order);
+				list.add(item);
 			}
-			
-			return orderItem;
+
+			return list;
 
 		} catch (SQLException e) {
 			throw new DbException(e.getMessage());
@@ -120,18 +122,16 @@ public class OrderItemDaoJDBC implements OrderItemDao {
 		}
 	}
 	
-	private OrderItem instantiateOrderItem(ResultSet rs) throws SQLException {
-		OrderItem orderItem = new OrderItem();
-		orderItem.setId(Integer.parseInt(rs.getString("Id")));
-		orderItem.setQuantity(Integer.parseInt(rs.getString("Quantity")));
-		orderItem.setPrice(Double.parseDouble(rs.getString("Price")));
-		OrderDao orderDao = DaoFactory.createOrderDao();
-		Order order = orderDao.findById(Integer.parseInt(rs.getString("OrderId")));
-		orderItem.setOrder(order);
-		ProductDao productDao = DaoFactory.createProductDao();
-		Product product = productDao.findById(Integer.parseInt(rs.getString("ProductId")));
-		orderItem.setProduct(product);
-		return orderItem;
+	private OrderItem instantiateOrderItem(ResultSet rs, Order order) throws SQLException {
+	    OrderItem item = new OrderItem();
+	    item.setId(rs.getInt("Id"));
+	    item.setQuantity(rs.getInt("Quantity"));
+	    item.setPrice(rs.getDouble("Price"));
+	    item.setOrder(order);
+	    ProductDao productDao = DaoFactory.createProductDao();
+	    Product product = productDao.findById(rs.getInt("ProductId"));
+	    item.setProduct(product);
+	    return item;
 	}
 
 }

@@ -19,7 +19,7 @@ public class ProgramOrderTests {
 		
 		System.out.println("=== TESTE 1: order findById ===");
 		OrderDao orderDao = DaoFactory.createOrderDao();
-		Order order = orderDao.findById(1);
+		Order order = orderDao.findById(2);
 		System.out.println(order);
 		
 		System.out.println("\n=== TESTE 2: order findByCustomer ===");

@@ -1,5 +1,6 @@
 package application;
 
+import java.util.List;
 import java.util.Scanner;
 
 import model.dao.DaoFactory;
@@ -20,8 +21,8 @@ public static void main(String[] args) {
 		OrderItemDao orderItemDao = DaoFactory.createOrderItemDao();
 		OrderDao orderDao = DaoFactory.createOrderDao();
 		Order order = orderDao.findById(2);
-		OrderItem orderItem = orderItemDao.findByOrder(order);
-		System.out.println(orderItem);
+		List<OrderItem> list = orderItemDao.findByOrder(order);
+		System.out.println(list);
 		
 		System.out.println("\n=== TESTE 2: orderItem insert ===");
 		ProductDao productDao = DaoFactory.createProductDao();

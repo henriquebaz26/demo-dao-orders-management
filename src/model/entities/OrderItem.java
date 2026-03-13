@@ -17,7 +17,6 @@ public class OrderItem implements Serializable {
 	}
 
 	public OrderItem(Integer id, Integer quantity, Double price, Order order, Product product) {
-		super();
 		this.id = id;
 		this.quantity = quantity;
 		this.price = price;
@@ -64,6 +63,10 @@ public class OrderItem implements Serializable {
 	public void setProduct(Product product) {
 		this.product = product;
 	}
+	
+	public Double getSubTotal() {
+		return price * quantity;
+	}
 
 	@Override
 	public int hashCode() {
@@ -84,8 +87,15 @@ public class OrderItem implements Serializable {
 
 	@Override
 	public String toString() {
-		return "OrderItem [id=" + id + ", quantity=" + quantity + ", price=" + price + ", order=" + order + ", product="
-				+ product + "]";
+		Integer orderId = (order != null) ? order.getId() : null;
+		String productName = (product != null) ? product.getName() : null;
+
+		return "OrderItem [id=" + id
+				+ ", quantity=" + quantity
+				+ ", price=" + price
+				+ ", orderId=" + orderId
+				+ ", product=" + productName
+				+ "]";
 	}
 
 }
