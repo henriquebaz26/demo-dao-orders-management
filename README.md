@@ -2,6 +2,8 @@
   <img src="assets/diagram.png" alt="Diagrama das Tabelas SQL" width="90%" />
 </div>
 
+<br>
+
 # 📦 Sistema de Gerenciamento de Pedidos
 ### Order Management System
 
@@ -44,10 +46,87 @@ Antes de começar, você precisará ter instalado em sua máquina:
 
 ## ⚙️ Configuração do Banco de Dados
 
-1. Crie um banco de dados chamado `order_management`.
+### 1. Scripts SQL
 
-2. Configure as credenciais de acesso no arquivo `db.properties` localizado na raiz do projeto:
+Execute os scripts abaixo na ordem indicada para criar toda a estrutura do banco.
 
+**Criar o banco de dados:**
+```sql
+CREATE DATABASE order_management;
+```
+
+**Tabela `customer`:**
+```sql
+USE order_management;
+
+CREATE TABLE customer (
+    Id        INT AUTO_INCREMENT PRIMARY KEY,
+    Name      VARCHAR(60) NOT NULL,
+    Email     VARCHAR(60),
+    Phone     VARCHAR(20),
+    CreatedAt DATE
+);
+```
+
+**Tabela `category`:**
+```sql
+USE order_management;
+
+CREATE TABLE category (
+    Id   INT AUTO_INCREMENT PRIMARY KEY,
+    Name VARCHAR(45) NOT NULL
+);
+```
+
+**Tabela `product`:**
+```sql
+USE order_management;
+
+CREATE TABLE product (
+    Id          INT AUTO_INCREMENT PRIMARY KEY,
+    Name        VARCHAR(60) NOT NULL,
+    Description TEXT,
+    Price       DOUBLE NOT NULL,
+    Stock       INT NOT NULL,
+    CategoryId  INT,
+
+    FOREIGN KEY (CategoryId) REFERENCES category(Id)
+);
+```
+
+**Tabela `order`:**
+```sql
+USE order_management;
+
+CREATE TABLE `order` (
+    Id         INT AUTO_INCREMENT PRIMARY KEY,
+    Moment     DATETIME NOT NULL,
+    Status     VARCHAR(20) NOT NULL,
+    CustomerId INT,
+
+    FOREIGN KEY (CustomerId) REFERENCES customer(Id)
+);
+```
+
+**Tabela `order_item`:**
+```sql
+USE order_management;
+
+CREATE TABLE order_item (
+    Id        INT AUTO_INCREMENT PRIMARY KEY,
+    Quantity  INT NOT NULL,
+    Price     DOUBLE NOT NULL,
+    OrderId   INT,
+    ProductId INT,
+
+    FOREIGN KEY (OrderId)   REFERENCES `order`(Id),
+    FOREIGN KEY (ProductId) REFERENCES product(Id)
+);
+```
+
+### 2. Configurar credenciais
+
+Configure as credenciais de acesso no arquivo `db.properties` localizado na raiz do projeto:
 ```properties
 user=seu_usuario
 password=sua_senha
